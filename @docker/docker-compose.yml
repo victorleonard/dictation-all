@@ -52,7 +52,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-dictation}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-!ChangeMe!}
     volumes:
-      - database_data:/var/lib/mysql:rw
+      - ../@data/mysql:/var/lib/mysql:rw
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     networks:
@@ -80,7 +80,6 @@ services:
       - app-network
 
 volumes:
-  database_data:
   backend_var:
 
 networks:

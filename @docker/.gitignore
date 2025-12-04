@@ -1,0 +1,5 @@
+# Fichier d'environnement Docker
+.env
+.env.local
+.env.*.local
+
