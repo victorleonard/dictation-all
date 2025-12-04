@@ -1,0 +1,93 @@
+diff --git a/src/Doctrine/Orm/Filter/SearchFilter.php b/src/Doctrine/Orm/Filter/SearchFilter.php
+index 961345e8d..1c775e4a8 100644
+--- a/src/Doctrine/Orm/Filter/SearchFilter.php
++++ b/src/Doctrine/Orm/Filter/SearchFilter.php
+@@ -23,6 +23,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
+ use ApiPlatform\Metadata\Operation;
+ use Doctrine\DBAL\Types\Types;
+ use Doctrine\ORM\Query\Expr\Join;
++use Doctrine\ORM\Query\Parameter;
+ use Doctrine\ORM\QueryBuilder;
+ use Doctrine\Persistence\ManagerRegistry;
+ use Psr\Log\LoggerInterface;
+@@ -192,6 +193,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+         }
+ 
+         $metadata = $this->getNestedMetadata($resourceClass, $associations);
++        $doctrineTypeField = $this->getDoctrineFieldType($property, $resourceClass);
+ 
+         if ($metadata->hasField($field)) {
+             if ('id' === $field) {
+@@ -199,7 +201,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+                 // todo: handle composite IDs
+             }
+ 
+-            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
++            if (!$this->hasValidValues($values, $doctrineTypeField)) {
+                 $this->logger->notice('Invalid filter ignored', [
+                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                 ]);
+@@ -207,7 +209,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+                 return;
+             }
+ 
+-            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive);
++            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive, $doctrineTypeField);
+ 
+             return;
+         }
+@@ -240,7 +242,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+             $associationField = $associationFieldIdentifier;
+         }
+ 
+-        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive);
++        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive, $doctrineTypeField);
+     }
+ 
+     /**
+@@ -248,7 +250,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+      *
+      * @throws InvalidArgumentException If strategy does not exist
+      */
+-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values, bool $caseSensitive): void
++    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values, bool $caseSensitive, string $doctrineTypeField): void
+     {
+         if (!\is_array($values)) {
+             $values = [$values];
+@@ -262,14 +264,24 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+             if (1 === \count($values)) {
+                 $queryBuilder
+                     ->andWhere($queryBuilder->expr()->eq($wrapCase($aliasedField), $wrapCase($valueParameter)))
+-                    ->setParameter($valueParameter, $values[0]);
++                    ->setParameter($valueParameter, $values[0], $doctrineTypeField);
+ 
+                 return;
+             }
+ 
++            // get current parameters, because QueryBuilder->setParameters() erase previous parameters set
++            $parameters = $queryBuilder->getParameters();
++            $inQuery = [];
++            for ($i = 0; $i < \count($values); ++$i) {
++                $inQuery[] = $valueParameter;
++                $parameters->add(new Parameter($valueParameter, $caseSensitive ? $values[$i] : strtolower($values[$i]), $doctrineTypeField));
++                $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
++            }
++
++            // we cannot use expr->in() here because it considers $inQuery parameters as strings.
+             $queryBuilder
+-                ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
+-                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
++                ->andWhere($wrapCase($aliasedField).' IN ('.implode(', ', $inQuery).')')
++                ->setParameters($parameters);
+ 
+             return;
+         }
+@@ -309,7 +321,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+ 
+         $queryBuilder->andWhere($queryBuilder->expr()->orX(...$ors));
+         foreach ($parameters as $parameter) {
+-            $queryBuilder->setParameter($parameter[1], $parameter[0]);
++            $queryBuilder->setParameter($parameter[1], $parameter[0], $doctrineTypeField);
+         }
+     }
+ 
