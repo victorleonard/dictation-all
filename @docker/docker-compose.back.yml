@@ -6,7 +6,6 @@ services:
     container_name: dictation_backend
     restart: unless-stopped
     volumes:
-      # Monter le code source pour le développement (commenter en production)
       - ../@back:/app
       # Volume pour les logs et cache
       - backend_var:/app/var
@@ -22,9 +21,6 @@ services:
         condition: service_healthy
     networks:
       - app-network
-    # Pour le développement, vous pouvez exposer le port 9000
-    # ports:
-    #   - "9000:9000"
 
   # Base de données MySQL/MariaDB pour Docker
   # IMPORTANT: Cette base est séparée de la base locale (@back/compose.yaml)

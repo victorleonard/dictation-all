@@ -7,7 +7,6 @@ services:
     container_name: dictation_backend
     restart: unless-stopped
     volumes:
-      # Monter le code source pour le développement (commenter en production)
       - ../@back:/app
       # Volume pour les logs et cache
       - backend_var:/app/var

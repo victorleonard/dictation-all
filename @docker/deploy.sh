@@ -23,8 +23,8 @@ show_help() {
     echo "Usage: ./deploy.sh [commande] [options]"
     echo ""
     echo "Commandes disponibles:"
-    echo "  start [all|backend|frontend|frontend-dev]  Démarre les services"
-    echo "  stop [all|backend|frontend|frontend-dev]   Arrête les services"
+    echo "  start [all|backend|frontend]                Démarre les services"
+    echo "  stop [all|backend|frontend]                 Arrête les services"
     echo "  restart [all|backend|frontend]             Redémarre les services"
     echo "  build [all|backend|frontend]               Construit les images"
     echo "  rebuild [all|backend|frontend]             Reconstruit les images (sans cache)"
@@ -40,7 +40,6 @@ show_help() {
     echo "Exemples:"
     echo "  ./deploy.sh start all                      Démarre tous les services"
     echo "  ./deploy.sh start backend                  Démarre uniquement le backend"
-    echo "  ./deploy.sh start frontend-dev             Démarre le frontend en mode dev"
     echo "  ./deploy.sh rebuild backend                Reconstruit l'image backend"
     echo "  ./deploy.sh deploy backend                 Déploie le backend (supprime + reconstruit + redémarre)"
     echo "  ./deploy.sh logs backend                   Affiche les logs du backend"
@@ -81,20 +80,14 @@ start_services() {
             echo -e "${BLUE}Backend API: http://localhost:3000${NC}"
             ;;
         frontend)
-            echo -e "${GREEN}Démarrage du frontend (production)...${NC}"
+            echo -e "${GREEN}Démarrage du frontend...${NC}"
             docker compose -f docker-compose.front.yml up -d
             echo -e "${GREEN}Frontend démarré avec succès!${NC}"
             echo -e "${BLUE}Frontend: http://localhost:8080${NC}"
             ;;
-        frontend-dev)
-            echo -e "${GREEN}Démarrage du frontend (développement)...${NC}"
-            docker compose -f docker-compose.front.dev.yml up -d
-            echo -e "${GREEN}Frontend dev démarré avec succès!${NC}"
-            echo -e "${BLUE}Frontend Dev: http://localhost:9000${NC}"
-            ;;
         *)
             echo -e "${RED}Service inconnu: $service${NC}"
-            echo "Services disponibles: all, backend, frontend, frontend-dev"
+            echo "Services disponibles: all, backend, frontend"
             exit 1
             ;;
     esac
@@ -110,7 +103,6 @@ stop_services() {
             docker compose -f docker-compose.yml down
             docker compose -f docker-compose.back.yml down 2>/dev/null || true
             docker compose -f docker-compose.front.yml down 2>/dev/null || true
-            docker compose -f docker-compose.front.dev.yml down 2>/dev/null || true
             echo -e "${GREEN}Services arrêtés${NC}"
             ;;
         backend)
@@ -121,13 +113,7 @@ stop_services() {
         frontend)
             echo -e "${YELLOW}Arrêt du frontend...${NC}"
             docker compose -f docker-compose.front.yml down
-            docker compose -f docker-compose.front.dev.yml down 2>/dev/null || true
             echo -e "${GREEN}Frontend arrêté${NC}"
-            ;;
-        frontend-dev)
-            echo -e "${YELLOW}Arrêt du frontend dev...${NC}"
-            docker compose -f docker-compose.front.dev.yml down
-            echo -e "${GREEN}Frontend dev arrêté${NC}"
             ;;
         *)
             echo -e "${RED}Service inconnu: $service${NC}"
@@ -229,7 +215,6 @@ deploy_services() {
         frontend)
             echo -e "${YELLOW}Déploiement frontend: arrêt et suppression des conteneurs...${NC}"
             docker compose -f docker-compose.front.yml down
-            docker compose -f docker-compose.front.dev.yml down 2>/dev/null || true
             echo -e "${GREEN}Reconstruction de l'image frontend (sans cache)...${NC}"
             docker compose -f docker-compose.front.yml build --no-cache
             echo -e "${GREEN}Démarrage du frontend...${NC}"
@@ -260,9 +245,6 @@ show_logs() {
             frontend)
                 docker compose -f docker-compose.front.yml logs -f frontend
                 ;;
-            frontend-dev)
-                docker compose -f docker-compose.front.dev.yml logs -f frontend-dev
-                ;;
             database)
                 docker compose -f docker-compose.back.yml logs -f database
                 ;;
@@ -271,7 +253,7 @@ show_logs() {
                 ;;
             *)
                 echo -e "${RED}Service inconnu: $service${NC}"
-                echo "Services disponibles: backend, frontend, frontend-dev, database, nginx"
+                echo "Services disponibles: backend, frontend, database, nginx"
                 exit 1
                 ;;
         esac
@@ -290,9 +272,6 @@ show_status() {
     echo ""
     echo -e "${YELLOW}Frontend:${NC}"
     docker compose -f docker-compose.front.yml ps 2>/dev/null || echo "Frontend non démarré"
-    echo ""
-    echo -e "${YELLOW}Frontend Dev:${NC}"
-    docker compose -f docker-compose.front.dev.yml ps 2>/dev/null || echo "Frontend dev non démarré"
 }
 
 # Fonction pour exécuter les migrations
@@ -317,7 +296,6 @@ clean_containers() {
     docker compose -f docker-compose.yml down 2>/dev/null || true
     docker compose -f docker-compose.back.yml down 2>/dev/null || true
     docker compose -f docker-compose.front.yml down 2>/dev/null || true
-    docker compose -f docker-compose.front.dev.yml down 2>/dev/null || true
     docker system prune -f
     echo -e "${GREEN}Nettoyage terminé${NC}"
 }
@@ -335,7 +313,6 @@ clean_all() {
     docker compose -f docker-compose.yml down -v 2>/dev/null || true
     docker compose -f docker-compose.back.yml down -v 2>/dev/null || true
     docker compose -f docker-compose.front.yml down -v 2>/dev/null || true
-    docker compose -f docker-compose.front.dev.yml down -v 2>/dev/null || true
     docker system prune -af --volumes
     echo -e "${GREEN}Nettoyage complet terminé${NC}"
 }
@@ -361,17 +338,9 @@ open_shell() {
                 exit 1
             fi
             ;;
-        frontend-dev)
-            if docker compose -f docker-compose.front.dev.yml ps frontend-dev | grep -q "Up"; then
-                docker compose -f docker-compose.front.dev.yml exec frontend-dev sh
-            else
-                echo -e "${RED}Le frontend dev n'est pas démarré${NC}"
-                exit 1
-            fi
-            ;;
         *)
             echo -e "${RED}Service inconnu: $service${NC}"
-            echo "Services disponibles: backend, frontend, frontend-dev"
+            echo "Services disponibles: backend, frontend"
             exit 1
             ;;
     esac
@@ -417,7 +386,7 @@ case "${1:-help}" in
         ;;
     shell)
         if [ -z "$2" ]; then
-            echo -e "${RED}Veuillez spécifier un service (backend, frontend, frontend-dev)${NC}"
+            echo -e "${RED}Veuillez spécifier un service (backend, frontend)${NC}"
             exit 1
         fi
         open_shell "$2"

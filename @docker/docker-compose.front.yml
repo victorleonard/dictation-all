@@ -9,13 +9,6 @@ services:
       - "${FRONTEND_PORT:-8080}:80"
     networks:
       - app-network
-    # Pour le développement, utilisez Dockerfile.front.dev et décommentez les lignes suivantes :
-    # volumes:
-    #   - ../@front:/app
-    #   - /app/node_modules
-    # environment:
-    #   - QUASAR_HOST=0.0.0.0
-    #   - QUASAR_PORT=9000
 
 networks:
   app-network:
