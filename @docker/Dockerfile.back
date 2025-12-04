@@ -1,0 +1,92 @@
+# Dockerfile pour le backend Symfony
+# Stage 1: Build des dépendances
+FROM php:8.2-fpm-alpine AS builder
+
+# Installer les dépendances système nécessaires
+RUN apk add --no-cache \
+    git \
+    unzip \
+    mysql-client \
+    mariadb-dev \
+    postgresql-dev \
+    icu-dev \
+    libzip-dev \
+    oniguruma-dev \
+    && docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    intl \
+    zip \
+    opcache
+
+# Installer Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY @back/composer.json @back/composer.lock ./
+
+# Installer les dépendances (sans les scripts pour accélérer le build)
+RUN composer install --no-scripts --no-autoloader --prefer-dist
+
+# Copier le reste du code source
+COPY @back/ ./
+
+# Générer l'autoloader et exécuter les scripts
+RUN composer dump-autoload --optimize && \
+    composer run-script --no-interaction post-install-cmd || true
+
+# Stage 2: Image de production
+FROM php:8.2-fpm-alpine
+
+# Installer les extensions PHP nécessaires
+RUN apk add --no-cache \
+    mysql-client \
+    mariadb-dev \
+    postgresql-dev \
+    icu-dev \
+    libzip-dev \
+    oniguruma-dev \
+    && docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    intl \
+    zip \
+    opcache \
+    && docker-php-ext-enable opcache
+
+# Configuration OPcache pour la production
+RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.interned_strings_buffer=16" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.max_accelerated_files=20000" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.save_comments=1" >> /usr/local/etc/php/conf.d/opcache.ini
+
+# Créer un utilisateur non-root pour la sécurité
+RUN addgroup -g 1000 appuser && \
+    adduser -u 1000 -G appuser -s /bin/sh -D appuser
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers depuis le builder
+COPY --from=builder --chown=appuser:appuser /app /app
+
+# Créer les répertoires nécessaires avec les bonnes permissions
+RUN mkdir -p var/cache var/log && \
+    chown -R appuser:appuser var && \
+    chmod -R 775 var
+
+# Passer à l'utilisateur non-root
+USER appuser
+
+# Exposer le port 9000 (port par défaut de PHP-FPM)
+EXPOSE 9000
+
+# Commande par défaut
+CMD ["php-fpm"]
