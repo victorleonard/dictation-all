@@ -10,7 +10,7 @@
 
 const { configure } = require("quasar/wrappers");
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -63,17 +63,20 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      vitePlugins: [
-        [
-          "vite-plugin-checker",
-          {
-            eslint: {
-              lintCommand: 'eslint "./**/*.{js,mjs,cjs,vue}"',
-            },
-          },
-          { server: false },
-        ],
-      ],
+      // Désactiver vite-plugin-checker en mode build pour accélérer la compilation
+      vitePlugins: ctx.dev
+        ? [
+            [
+              "vite-plugin-checker",
+              {
+                eslint: {
+                  lintCommand: 'eslint "./**/*.{js,mjs,cjs,vue}"',
+                },
+              },
+              { server: false },
+            ],
+          ]
+        : [],
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer

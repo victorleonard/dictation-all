@@ -12,7 +12,8 @@ WORKDIR /app
 COPY @front/package.json @front/package-lock.json ./
 
 # Installer les dépendances
-RUN npm ci --only=production=false
+RUN npm ci --only=production=false && \
+    npx update-browserslist-db@latest
 
 # Copier le reste du code source
 COPY @front/ ./
@@ -20,6 +21,10 @@ COPY @front/ ./
 # Accepter les arguments de build pour les variables d'environnement
 ARG VITE_API_BASE_URL=http://localhost:3000/
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+# Variables d'environnement pour optimiser le build Vite
+ENV NODE_ENV=production
+ENV CI=true
 
 # Construire l'application pour la production
 RUN npm run build
