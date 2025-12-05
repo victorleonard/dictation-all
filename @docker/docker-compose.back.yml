@@ -37,10 +37,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-!ChangeMe!}
     volumes:
       - ../@data/mysql:/var/lib/mysql:rw
-    ports:
-      # Port exposé sur l'hôte (par défaut 3306)
-      # Si votre MySQL local utilise déjà le port 3306, changez MYSQL_PORT dans .env
-      - "${MYSQL_PORT:-3306}:3306"
+    # Port MySQL non exposé - accès uniquement via le réseau Docker interne
+    # Le backend y accède via le nom du service 'database:3306'
     networks:
       - app-network
     healthcheck:
