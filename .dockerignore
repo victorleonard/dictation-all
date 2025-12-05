@@ -1,0 +1,14 @@
+# Exclure le répertoire vendor du backend (installé par Composer dans l'image)
+@back/vendor/
+
+# Exclure les répertoires de cache et logs
+@back/var/cache/
+@back/var/log/
+
+# Exclure les fichiers de configuration locaux
+@back/.env.local
+@back/.env.*.local
+
+# Exclure node_modules
+@front/node_modules/
+

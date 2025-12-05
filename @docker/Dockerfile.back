@@ -33,6 +33,7 @@ COPY @back/composer.json @back/composer.lock ./
 RUN composer install --no-scripts --no-autoloader --prefer-dist
 
 # Copier le reste du code source
+# Le .dockerignore à la racine exclut @back/vendor/ pour ne pas écraser celui installé
 COPY @back/ ./
 
 # Générer l'autoloader et exécuter les scripts

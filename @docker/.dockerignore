@@ -29,6 +29,9 @@ tests/
 # Node modules (si présents)
 node_modules/
 
+# Vendor (installé par Composer dans l'image)
+@back/vendor/
+
 # Fichiers temporaires
 *.tmp
 *.bak
