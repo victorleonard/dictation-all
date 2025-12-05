@@ -53,8 +53,10 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-!ChangeMe!}
     volumes:
       - ../../@data/mysql:/var/lib/mysql:rw
-    # Port MySQL non exposé - accès uniquement via le réseau Docker interne
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
     # Le backend y accède via le nom du service 'database:3306'
+    # Le port est exposé pour permettre l'accès depuis TablePlus ou d'autres outils externes
     networks:
       - app-network
     healthcheck:
