@@ -17,6 +17,7 @@ services:
     environment:
       - APP_ENV=${APP_ENV:-prod}
       - APP_DEBUG=${APP_DEBUG:-0}
+      - APP_SECRET=${APP_SECRET:-ChangeMeToASecretKeyInProduction}
       - DATABASE_URL=${DATABASE_URL:-mysql://dictation:!ChangeMe!@database:3306/dictation?serverVersion=8.0&charset=utf8mb4}
       - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$}
     depends_on:

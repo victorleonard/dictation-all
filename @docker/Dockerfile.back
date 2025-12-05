@@ -82,6 +82,12 @@ RUN mkdir -p var/cache var/log && \
     chown -R appuser:appuser var && \
     chmod -R 775 var
 
+# Créer un fichier .env minimal (les variables d'environnement Docker prendront le dessus)
+RUN echo "APP_ENV=prod" > /app/.env && \
+    echo "APP_DEBUG=0" >> /app/.env && \
+    echo "APP_SECRET=ChangeMeToASecretKeyInProduction" >> /app/.env && \
+    chown appuser:appuser /app/.env
+
 # Copier le script d'entrypoint
 COPY @docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
