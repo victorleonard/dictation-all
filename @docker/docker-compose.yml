@@ -27,9 +27,9 @@ services:
       context: ..
       dockerfile: "@docker/Dockerfile.front"
       args:
-        # URL de l'API backend - accessible depuis le navigateur du client
-        # Le JavaScript s'exécute dans le navigateur, donc on utilise localhost:3000
-        VITE_API_BASE_URL: http://localhost:3000/
+        # URL de l'API backend - utilise une URL relative pour passer par le proxy Nginx
+        # Le proxy Nginx du frontend redirige vers le backend via le réseau Docker interne
+        VITE_API_BASE_URL: /api/
     container_name: dictation_frontend
     restart: unless-stopped
     ports:

@@ -8,8 +8,9 @@ import axios from "axios";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-// URL de base de l'API - utilise une variable d'environnement si disponible, sinon localhost:3000
-const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
+// URL de base de l'API - utilise une variable d'environnement si disponible, sinon URL relative
+// En production Docker, utilise le proxy Nginx qui communique avec le backend via le réseau interne
+const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "/api/";
 const api = axios.create({ baseURL: apiBaseURL });
 
 // Intercepteur de requête : ajoute le token JWT à chaque requête
