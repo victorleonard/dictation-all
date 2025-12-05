@@ -82,11 +82,16 @@ RUN mkdir -p var/cache var/log && \
     chown -R appuser:appuser var && \
     chmod -R 775 var
 
-# Passer à l'utilisateur non-root
-USER appuser
+# Copier le script d'entrypoint
+COPY @docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# PHP-FPM doit s'exécuter en root pour créer les sockets
+# Les workers PHP-FPM utiliseront l'utilisateur configuré dans php-fpm.conf
 
 # Exposer le port 9000 (port par défaut de PHP-FPM)
 EXPOSE 9000
 
-# Commande par défaut
+# Utiliser le script d'entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
