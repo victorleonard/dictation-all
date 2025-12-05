@@ -52,7 +52,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-dictation}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-!ChangeMe!}
     volumes:
-      - ../@data/mysql:/var/lib/mysql:rw
+      - ../../@data/mysql:/var/lib/mysql:rw
     # Port MySQL non exposé - accès uniquement via le réseau Docker interne
     # Le backend y accède via le nom du service 'database:3306'
     networks:

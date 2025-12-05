@@ -24,7 +24,7 @@ services:
 
   # Base de données MySQL/MariaDB pour Docker
   # IMPORTANT: Cette base est séparée de la base locale (@back/compose.yaml)
-  # Les données sont stockées dans le dossier @data/mysql pour garantir la persistance
+  # Les données sont stockées dans le dossier ../../@data/mysql (au-dessus du projet) pour garantir la persistance
   # Utilisation de MySQL pour correspondre aux migrations existantes
   database:
     image: mysql:${MYSQL_VERSION:-8.0}
@@ -36,7 +36,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-app}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-!ChangeMe!}
     volumes:
-      - ../@data/mysql:/var/lib/mysql:rw
+      - ../../@data/mysql:/var/lib/mysql:rw
     # Port MySQL non exposé - accès uniquement via le réseau Docker interne
     # Le backend y accède via le nom du service 'database:3306'
     networks:
