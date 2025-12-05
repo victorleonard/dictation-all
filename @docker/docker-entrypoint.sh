@@ -16,6 +16,13 @@ EOF
     chown appuser:appuser /app/.env 2>/dev/null || true
 fi
 
+# Créer les répertoires var/cache et var/log avec les bonnes permissions
+# Ces répertoires peuvent être écrasés par le volume backend_var
+echo "Vérification des répertoires var/cache et var/log..."
+mkdir -p /app/var/cache/prod /app/var/cache/dev /app/var/log
+chown -R appuser:appuser /app/var 2>/dev/null || true
+chmod -R 775 /app/var 2>/dev/null || true
+
 # Si le volume public est monté et vide, copier le contenu depuis l'image
 if [ -d "/app/public" ] && [ -d "/shared/public" ] && [ -z "$(ls -A /shared/public 2>/dev/null)" ]; then
     echo "Initialisation du volume public partagé..."

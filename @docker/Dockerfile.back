@@ -92,8 +92,11 @@ RUN echo "APP_ENV=prod" > /app/.env && \
 COPY @docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Copier la configuration PHP-FPM personnalisée
+COPY @docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+
 # PHP-FPM doit s'exécuter en root pour créer les sockets
-# Les workers PHP-FPM utiliseront l'utilisateur configuré dans php-fpm.conf
+# Les workers PHP-FPM utiliseront l'utilisateur appuser configuré dans php-fpm.conf
 
 # Exposer le port 9000 (port par défaut de PHP-FPM)
 EXPOSE 9000
