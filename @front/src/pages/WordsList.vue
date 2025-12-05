@@ -9,7 +9,7 @@
           <q-input v-model="newWord" label="Mot" class="q-mb-sm" />
           <q-select
             v-model="level"
-            :options="['CE1', 'CE2']"
+            :options="['CE1', 'CE2', 'CM1', 'CM2', '6ème']"
             label="Niveau"
             class="q-mb-md"
           />
