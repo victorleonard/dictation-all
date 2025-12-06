@@ -4,6 +4,5 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-auth:
-    path: /api/auth
-    methods: ['POST']
+# La route /api/auth est gérée automatiquement par Symfony Security (json_login)
+# Pas besoin de la définir ici
