@@ -45,6 +45,35 @@ if [ -d "/app/public" ] && [ -d "/shared/public" ] && [ -z "$(ls -A /shared/publ
     chown -R appuser:appuser /shared/public 2>/dev/null || true
 fi
 
+# Exécuter les migrations de base de données
+# Attendre que la base de données soit prête et exécuter les migrations
+echo "Attente de la disponibilité de la base de données..."
+max_attempts=30
+attempt=0
+db_ready=false
+
+while [ $attempt -lt $max_attempts ]; do
+    # Vérifier la connexion en essayant d'exécuter une commande doctrine simple
+    if php bin/console doctrine:migrations:status >/dev/null 2>&1; then
+        echo "Base de données disponible!"
+        db_ready=true
+        break
+    fi
+    attempt=$((attempt + 1))
+    if [ $((attempt % 5)) -eq 0 ]; then
+        echo "Tentative $attempt/$max_attempts..."
+    fi
+    sleep 2
+done
+
+# Exécuter les migrations si la base de données est disponible
+if [ "$db_ready" = true ]; then
+    echo "Exécution des migrations de base de données..."
+    php bin/console doctrine:migrations:migrate --no-interaction || echo "Avertissement: Les migrations ont échoué ou sont déjà à jour"
+else
+    echo "Avertissement: Impossible de se connecter à la base de données après $max_attempts tentatives. Les migrations seront ignorées."
+fi
+
 # Exécuter la commande (PHP-FPM doit s'exécuter en root pour créer les sockets)
 exec "$@"
 
