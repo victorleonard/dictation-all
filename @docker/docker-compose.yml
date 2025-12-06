@@ -20,6 +20,9 @@ services:
       - APP_SECRET=${APP_SECRET:-ChangeMeToASecretKeyInProduction}
       - DATABASE_URL=${DATABASE_URL:-mysql://dictation:!ChangeMe!@database:3306/dictation?serverVersion=8.0&charset=utf8mb4}
       - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-/app/config/jwt/private.pem}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY:-/app/config/jwt/public.pem}
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE:-ChangeMeToASecretPassphrase}
     depends_on:
       database:
         condition: service_healthy

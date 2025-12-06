@@ -51,6 +51,7 @@ RUN apk add --no-cache \
     icu-dev \
     libzip-dev \
     oniguruma-dev \
+    openssl \
     && docker-php-ext-install \
     pdo \
     pdo_mysql \
@@ -79,9 +80,10 @@ WORKDIR /app
 COPY --from=builder --chown=appuser:appuser /app /app
 
 # Créer les répertoires nécessaires avec les bonnes permissions
-RUN mkdir -p var/cache var/log && \
-    chown -R appuser:appuser var && \
-    chmod -R 775 var
+RUN mkdir -p var/cache var/log config/jwt && \
+    chown -R appuser:appuser var config/jwt && \
+    chmod -R 775 var && \
+    chmod 755 config/jwt
 
 # Créer un fichier .env minimal (les variables d'environnement Docker prendront le dessus)
 RUN echo "APP_ENV=prod" > /app/.env && \

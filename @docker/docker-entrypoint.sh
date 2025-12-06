@@ -23,6 +23,21 @@ mkdir -p /app/var/cache/prod /app/var/cache/dev /app/var/log
 chown -R appuser:appuser /app/var 2>/dev/null || true
 chmod -R 775 /app/var 2>/dev/null || true
 
+# Générer les clés JWT si elles n'existent pas
+if [ ! -f "/app/config/jwt/private.pem" ] || [ ! -f "/app/config/jwt/public.pem" ]; then
+    echo "Génération des clés JWT..."
+    mkdir -p /app/config/jwt
+    # Générer la clé privée
+    openssl genpkey -out /app/config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096 -pass pass:${JWT_PASSPHRASE:-ChangeMeToASecretPassphrase} 2>/dev/null || \
+    openssl genrsa -out /app/config/jwt/private.pem -aes256 -passout pass:${JWT_PASSPHRASE:-ChangeMeToASecretPassphrase} 4096 2>/dev/null || true
+    # Générer la clé publique
+    if [ -f "/app/config/jwt/private.pem" ]; then
+        openssl pkey -in /app/config/jwt/private.pem -pubout -out /app/config/jwt/public.pem -passin pass:${JWT_PASSPHRASE:-ChangeMeToASecretPassphrase} 2>/dev/null || true
+    fi
+    chown -R appuser:appuser /app/config/jwt 2>/dev/null || true
+    chmod 600 /app/config/jwt/*.pem 2>/dev/null || true
+fi
+
 # Si le volume public est monté et vide, copier le contenu depuis l'image
 if [ -d "/app/public" ] && [ -d "/shared/public" ] && [ -z "$(ls -A /shared/public 2>/dev/null)" ]; then
     echo "Initialisation du volume public partagé..."
