@@ -18,8 +18,11 @@ const api = axios.create({ baseURL: apiBaseURL });
 api.interceptors.request.use(
   function (config) {
     // Corriger les URLs qui commencent par /api/ pour éviter /api/api/...
+    // La baseURL est déjà /api, donc on enlève le préfixe /api/ des chemins
     if (config.url && config.url.startsWith("/api/")) {
-      config.url = config.url.substring(4); // Enlever "/api" du début
+      const originalUrl = config.url;
+      config.url = config.url.substring(5); // Enlever "/api/" du début (5 caractères)
+      console.log(`[Axios] URL corrigée: ${originalUrl} -> ${config.url} (baseURL: ${config.baseURL})`);
     }
     
     const token = LocalStorage.getItem("dictation_user_token");
