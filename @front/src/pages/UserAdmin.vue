@@ -139,7 +139,7 @@ function deleteWordError() {
 }
 
 function getUsers() {
-  api.get("api/users").then((res) => {
+  api.get("/api/users").then((res) => {
     users.value = res.data["hydra:member"].map((el) => {
       return {
         value: el.id,

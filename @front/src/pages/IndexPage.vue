@@ -225,7 +225,7 @@ function getRandomWord() {
     currentAudioUrl.value = null;
   }
 
-  api.get("api/words/random").then((res) => {
+  api.get("/api/words/random").then((res) => {
     word.value = res.data;
     result.value = "";
     userInput.value = "";

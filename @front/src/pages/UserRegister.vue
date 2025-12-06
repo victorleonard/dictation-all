@@ -62,7 +62,7 @@ function onReset() {
 
 function onSubmit() {
   api
-    .post("api/users", {
+    .post("/api/users", {
       username: username.value,
       plainPassword: password.value,
     })

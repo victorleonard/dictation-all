@@ -223,7 +223,7 @@ function reset() {
 function getRandomVerb() {
   result.value = "";
   isChecking.value = false;
-  api.get("api/verbs/random").then((res) => {
+  api.get("/api/verbs/random").then((res) => {
     verb.value = {
       value: res.data.value,
       time: res.data.time,

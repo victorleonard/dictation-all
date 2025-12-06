@@ -148,7 +148,7 @@ function check() {
 function getRandomTime() {
   result.value = "";
   isChecking.value = false;
-  api.get("api/hours/random").then((res) => {
+  api.get("/api/hours/random").then((res) => {
     console.log(res.data);
     randomTime.value = {
       id: res.data.id,

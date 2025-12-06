@@ -57,7 +57,7 @@ const password = ref("");
 
 function onSubmit() {
   api
-    .post("auth", {
+    .post("/api/auth", {
       username: username.value,
       password: password.value,
     })
