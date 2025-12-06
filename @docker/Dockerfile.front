@@ -24,6 +24,10 @@ COPY @front/ ./
 ARG VITE_API_BASE_URL=
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
+# Clé API ElevenLabs pour la synthèse vocale
+ARG VITE_ELEVENLABS_API_KEY=
+ENV VITE_ELEVENLABS_API_KEY=$VITE_ELEVENLABS_API_KEY
+
 # Variables d'environnement pour optimiser le build Vite
 ENV NODE_ENV=production
 ENV CI=true

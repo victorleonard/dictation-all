@@ -38,6 +38,8 @@ services:
         # Base URL vide car les appels API dans le code utilisent déjà /api/...
         # Le proxy Nginx du frontend redirige /api vers le backend via le réseau Docker interne
         VITE_API_BASE_URL: ""
+        VITE_ELEVENLABS_API_KEY: ${VITE_ELEVENLABS_API_KEY:-}
+        VITE_ELEVENLABS_VOICE_ID: ${VITE_ELEVENLABS_VOICE_ID:-}
     container_name: dictation_frontend
     restart: unless-stopped
     ports:
