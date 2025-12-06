@@ -39,6 +39,7 @@
           label="Écouter"
           icon="volume_up"
           unelevated
+          :loading="isLoading"
           @click="say"
         />
       </div>
@@ -103,6 +104,7 @@ let word = ref("");
 let seeWord = ref(false);
 let userInput = ref("");
 let result = ref("");
+let isLoading = ref(false);
 
 // Référence à l'audio actuel pour pouvoir l'arrêter si nécessaire
 let currentAudio = ref(null);
@@ -127,6 +129,9 @@ async function say() {
     console.error("Clé API ElevenLabs non configurée. Veuillez définir VITE_ELEVENLABS_API_KEY dans votre fichier .env");
     return;
   }
+
+  // Activer le loader
+  isLoading.value = true;
 
   // Arrêter l'audio précédent s'il existe
   if (currentAudio.value) {
@@ -169,6 +174,9 @@ async function say() {
     const audio = new Audio(audioUrl);
     currentAudio.value = audio;
 
+    // Désactiver le loader une fois que l'audio est prêt à être joué
+    isLoading.value = false;
+
     audio.play();
 
     // Nettoyer l'URL après la lecture
@@ -188,6 +196,7 @@ async function say() {
     console.error("Erreur lors de la conversion texte vers audio:", error);
     currentAudio.value = null;
     currentAudioUrl.value = null;
+    isLoading.value = false;
   }
 }
 
