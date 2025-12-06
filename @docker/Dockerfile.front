@@ -20,7 +20,8 @@ COPY @front/ ./
 
 # Accepter les arguments de build pour les variables d'environnement
 # URL relative par défaut pour utiliser le proxy Nginx qui communique via le réseau Docker interne
-ARG VITE_API_BASE_URL=/api/
+# Pas de slash final pour éviter les doubles /api/api/ quand les chemins commencent par /api/
+ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Variables d'environnement pour optimiser le build Vite

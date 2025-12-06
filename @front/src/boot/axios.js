@@ -10,12 +10,18 @@ import axios from "axios";
 // for each client)
 // URL de base de l'API - utilise une variable d'environnement si disponible, sinon URL relative
 // En production Docker, utilise le proxy Nginx qui communique avec le backend via le réseau interne
-const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "/api/";
+// Note: pas de slash final pour éviter les doubles /api/api/ quand les chemins commencent par /api/
+const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "/api";
 const api = axios.create({ baseURL: apiBaseURL });
 
-// Intercepteur de requête : ajoute le token JWT à chaque requête
+// Intercepteur de requête : ajoute le token JWT et corrige les URLs avec double /api/
 api.interceptors.request.use(
   function (config) {
+    // Corriger les URLs qui commencent par /api/ pour éviter /api/api/...
+    if (config.url && config.url.startsWith("/api/")) {
+      config.url = config.url.substring(4); // Enlever "/api" du début
+    }
+    
     const token = LocalStorage.getItem("dictation_user_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
