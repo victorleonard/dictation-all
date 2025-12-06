@@ -19,9 +19,9 @@ RUN npm ci --only=production=false && \
 COPY @front/ ./
 
 # Accepter les arguments de build pour les variables d'environnement
-# URL relative par défaut pour utiliser le proxy Nginx qui communique via le réseau Docker interne
-# Pas de slash final pour éviter les doubles /api/api/ quand les chemins commencent par /api/
-ARG VITE_API_BASE_URL=/api
+# Base URL vide car les appels API dans le code utilisent déjà /api/...
+# Le proxy Nginx redirige /api vers le backend
+ARG VITE_API_BASE_URL=
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Variables d'environnement pour optimiser le build Vite

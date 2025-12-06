@@ -32,10 +32,9 @@ services:
       context: ..
       dockerfile: "@docker/Dockerfile.front"
       args:
-        # URL de l'API backend - utilise une URL relative pour passer par le proxy Nginx
-        # Le proxy Nginx du frontend redirige vers le backend via le réseau Docker interne
-        # Pas de slash final pour éviter les doubles /api/api/ quand les chemins commencent par /api/
-        VITE_API_BASE_URL: /api
+        # Base URL vide car les appels API dans le code utilisent déjà /api/...
+        # Le proxy Nginx du frontend redirige /api vers le backend via le réseau Docker interne
+        VITE_API_BASE_URL: ""
     container_name: dictation_frontend
     restart: unless-stopped
     ports:
