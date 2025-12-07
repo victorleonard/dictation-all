@@ -52,6 +52,7 @@
               :disable="result ? 'disable' : null"
               filled
               style="font-size: 2em"
+              spellcheck="false"
             />
             <q-btn
               unelevated

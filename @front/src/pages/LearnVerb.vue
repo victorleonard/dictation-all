@@ -57,6 +57,7 @@
               :readonly="isChecking"
               class="q-mb-sm"
               :error="isChecking && newVerb.s1 !== verb.s1"
+              spellcheck="false"
             />
             <q-input
               v-model="newVerb.s2"
@@ -64,6 +65,7 @@
               :readonly="isChecking"
               class="q-mb-sm"
               :error="isChecking && newVerb.s2 !== verb.s2"
+              spellcheck="false"
             />
             <q-input
               v-model="newVerb.s3"
@@ -71,6 +73,7 @@
               :readonly="isChecking"
               class="q-mb-sm"
               :error="isChecking && newVerb.s3 !== verb.s3"
+              spellcheck="false"
             />
             <q-input
               v-model="newVerb.p1"
@@ -78,6 +81,7 @@
               :readonly="isChecking"
               class="q-mb-sm"
               :error="isChecking && newVerb.p1 !== verb.p1"
+              spellcheck="false"
             />
             <q-input
               v-model="newVerb.p2"
@@ -85,6 +89,7 @@
               :readonly="isChecking"
               class="q-mb-sm"
               :error="isChecking && newVerb.p2 !== verb.p2"
+              spellcheck="false"
             />
             <q-input
               v-model="newVerb.p3"
@@ -92,6 +97,7 @@
               :readonly="isChecking"
               class="q-mb-sm"
               :error="isChecking && newVerb.p3 !== verb.p3"
+              spellcheck="false"
             />
           </q-card-section>
           <q-card-actions>

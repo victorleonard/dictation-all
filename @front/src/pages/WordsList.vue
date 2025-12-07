@@ -6,7 +6,7 @@
           <div class="text-h6">Enregistrer un nouveau mot</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <q-input v-model="newWord" label="Mot" class="q-mb-sm" />
+          <q-input v-model="newWord" label="Mot" class="q-mb-sm" spellcheck="false" />
           <q-select
             v-model="level"
             :options="['CE1', 'CE2', 'CM1', 'CM2', '6ème']"
